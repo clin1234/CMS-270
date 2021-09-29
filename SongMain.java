@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.*;
 
-public class Main {
+public class SongMain {
 
     public static void main(String[] args) {
         out.println("Input list of songs in the following format: name, composer, runtime (in seconds). "
