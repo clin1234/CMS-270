@@ -1,32 +1,37 @@
-public class Account {
-    private String name;
-    private String superpower;
-    private int lives;
-    public String getName() {
-        return name;
+/**
+ * Lab 5
+ * @author Alex Billini
+ * @since 10/6/2021
+ */
+public abstract class Account {
+    private float balance;
+    private String owner;
+
+    public Account(float balance, String owner) {
+        this.balance = balance;
+        this.owner = owner;
     }
-    public void setName(String name) {
-        this.name = name;
+
+    // Getters and setters
+
+    public float getBalance() {
+        return balance;
     }
-    public String getSuperpower() {
-        return superpower;
+
+    public void setBalance(float balance) {
+        this.balance = balance;
     }
-    public void setSuperpower(String superpower) {
-        this.superpower = superpower;
+
+    public String getOwner() {
+        return owner;
     }
-    public int getLives() {
-        return lives;
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
-    public void setLives(int lives) {
-        this.lives = lives;
-    }
-    public Account(String name, String superpower, int lives) {
-        this.name = name;
-        this.superpower = superpower;
-        this.lives = lives;
-    }
-    @Override
-    public String toString() {
-        return "Name: " + name + ", Number of lives: " + lives + ", Superpower: " + superpower;
-    }
+
+    // Will be overridden in subclasses
+
+    public abstract void deposit(float amount);
+    public abstract void withdraw(float amount);
 }
