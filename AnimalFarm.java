@@ -1,7 +1,8 @@
 /**
  * @author Charlie Lin
  * @since 10/20/2021
- * Hang Out Lab
+ * 
+ * Lab 6
  */
 public class AnimalFarm {
     public static void walkTheAnimal(Animal a, int x) {
@@ -26,5 +27,11 @@ public class AnimalFarm {
         walkTheAnimal(c, 5);
         walkTheAnimal(a, 2);
         walkTheAnimal(ac, 2);
+
+        /* Doesn't work due to static binding:
+        because there's no instance method called
+        swim in the Animal class, a's declared type,
+        compilation fails. */
+        // a.swim();
     }
 }

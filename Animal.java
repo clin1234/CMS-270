@@ -1,7 +1,7 @@
 /**
  * @author Charlie Lin
  * @since 10/20/2021
- * Hang Out Lab
+ * Lab 6
  */
 
 public abstract class Animal {

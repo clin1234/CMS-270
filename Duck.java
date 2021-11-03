@@ -40,4 +40,8 @@ public class Duck extends Animal {
 
     }
 
+    public void swim() {
+        System.out.println("I'm swimming.");
+    }
+
 }

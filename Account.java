@@ -1,18 +1,13 @@
-/**
- * Lab 5
- * @author Alex Billini
- * @since 10/6/2021
- */
 public abstract class Account {
     private float balance;
+    private int number;
     private String owner;
 
-    public Account(float balance, String owner) {
+    public Account(float balance, int number, String owner) {
         this.balance = balance;
+        this.number = number;
         this.owner = owner;
     }
-
-    // Getters and setters
 
     public float getBalance() {
         return balance;
@@ -30,8 +25,18 @@ public abstract class Account {
         this.owner = owner;
     }
 
-    // Will be overridden in subclasses
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
 
     public abstract void deposit(float amount);
     public abstract void withdraw(float amount);
+    public void transfer(Account a, float amount) {
+        withdraw(amount);
+        a.deposit(amount);
+    }
 }
