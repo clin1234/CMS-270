@@ -17,15 +17,16 @@ public class BatchProcessor {
 
     public static void main(String[] args) {
         try {
-            parseAccountsFile();
+            parseAccounts();
             parseBatches();
             writeAccounts();
+        // Handle exceptions in main() to simplify code flow
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void parseAccountsFile() throws IOException {
+    public static void parseAccounts() throws IOException {
         final var lines = Files.readAllLines(Paths.get("accounts.txt"));
         accounts = new ArrayList<>(lines.size());
         String[] fields;
@@ -44,7 +45,7 @@ public class BatchProcessor {
                     and the maxmimum number of checks allowed. */
                     case "C" -> new CheckingAccount(balance, id, name, Integer.parseInt(fields[6]), Integer.parseInt(fields[5]));
                     case "S" -> new SavingsAccount(balance, id, name);
-                    // Unlikely, but helpful in case of bad input
+                    // Unlikely, but helpful in case of bad input. Also required in a switch expression.
                     default -> throw new IllegalArgumentException("Unexpected value: " + fields[1]);
                 }
             );
@@ -57,30 +58,24 @@ public class BatchProcessor {
             final var fields = line.split(" ");
             final int id = Integer.parseInt(fields[1]);
             // One-liner to find an Account object corresponding to the Account number
-            final var tmp = accounts.parallelStream().filter(a -> a.getNumber() == id).findAny();
+            final var sourceAct = accounts.parallelStream().filter(a -> a.getNumber() == id).findAny();
             /* The tmp.ifPresentOrElse method ensures that in case no account has the id,
             the program errors out before executing any type of transaction. */
             switch (fields[0]) {
                 case "W": {
                     final String name = fields[3] + " " + fields[4];
                     final float amt = Float.parseFloat(fields[2]);
-                    tmp.ifPresentOrElse(val -> {
-                        val = processWithdrawal(val, amt, name);
-                    }, () -> System.out.println("Account " + id + " not found."));
+                    sourceAct.ifPresent(v -> v = processWithdrawal(v, amt, name));
                 }
                     break;
                 case "D": {
                     final float amt = Float.parseFloat(fields[2]);
-                    tmp.ifPresentOrElse(val -> {
-                        val = processDeposit(val, amt);
-                    }, () -> System.out.println("Account " + id + " not found."));
+                    sourceAct.ifPresent(v -> v = processDeposit(v, amt));
                 }
                     break;
                 case "C": {
                     final String name = fields[2] + " " + fields[3];
-                    tmp.ifPresentOrElse(val -> {
-                        val = processClose(val, name);
-                    }, () -> System.out.println("Account " + id + " not found."));
+                    sourceAct.ifPresent(v -> v = processClose(v, name));
                 }
                     break;
 
@@ -90,8 +85,8 @@ public class BatchProcessor {
                     final int destId = Integer.parseInt(fields[2]);
                     // One-liner to find an Account object corresponding to the destination account number
                     var destAcct = accounts.stream().filter(a -> a.getNumber() == destId).findAny();
-                    if (destAcct.isPresent() && tmp.isPresent()) {
-                        processTransfer(tmp.get(), destAcct.get(), amt, name);
+                    if (destAcct.isPresent() && sourceAct.isPresent()) {
+                        processTransfer(sourceAct.get(), destAcct.get(), amt, name);
                     }
                 }
                     break;
@@ -107,7 +102,7 @@ public class BatchProcessor {
             for (final var a : accounts) {
                 final char type = a instanceof CheckingAccount ? 'C' : 'S';
                 // Appending to a StringBuilder instead of a String is less costly resource-wise
-                var b = new StringBuilder("%d %c %s %.2f".formatted(a.getNumber(), type, a.getOwner(), a.getBalance()));
+                final var b = new StringBuilder("%d %c %s %.2f".formatted(a.getNumber(), type, a.getOwner(), a.getBalance()));
                 if (a instanceof CheckingAccount c)
                     b.append(" %d %d".formatted(c.getChecksUsed(), c.getMonthlyCheckLimit()));
                 write.println(b.toString());
@@ -117,7 +112,8 @@ public class BatchProcessor {
     }
 
     public static Account processDeposit(Account a, double Amt) {
-        a.deposit((float) Amt);
+        a.deposit(Amt);
+        System.out.println(a.toString());
         return a;
     }
 
@@ -125,7 +121,8 @@ public class BatchProcessor {
         if (!a.getOwner().equals(owner))
             System.err.println(owner + " cannot withdraw %.2f from Account %d".formatted(Amt, a.getNumber()));
         else
-            a.withdraw((float) Amt);
+            a.withdraw(Amt);
+        System.out.println(a.toString());
         return a;
     }
 
@@ -133,14 +130,20 @@ public class BatchProcessor {
         if (!a.getOwner().equals(owner)) {
             System.err.println(owner + " cannot transfer from Account %d".formatted(a.getNumber()));
         }
-        a.transfer(b, (float) Amt);
+        a.transfer(b, Amt);
+        System.out.println(a.toString());
     }
 
     public static Account processClose(Account a, String owner) {
         if (!a.getOwner().equals(owner) || a.getBalance() < 0) {
             System.err.println(owner + " cannot close Account %d".formatted(a.getNumber()));
             return a;
-        } else
-            return accounts.remove(accounts.indexOf(a));
+        } else {
+            a.close();
+            System.out.println(a.toString());
+            var b = accounts.remove(accounts.indexOf(a));
+            assert !accounts.contains(b);
+            return b;
+        }
     }
 }

@@ -1,16 +1,23 @@
 /**
  * Assignment 2
+ * 
  * @author Charlie Lin
  * @since 11/3/2021
  */
 public class CheckingAccount extends Account {
-    private final int monthlyCheckLimit;
+    private int monthlyCheckLimit;
     private int checksUsed;
+    private String ERROR = "Maximum number of checks (%d) for account %d reached".formatted(monthlyCheckLimit,
+            getNumber());
 
     // Getters and setters
 
     public int getMonthlyCheckLimit() {
         return monthlyCheckLimit;
+    }
+
+    public void setMonthlyCheckLimit(int monthlyCheckLimit) {
+        this.monthlyCheckLimit = monthlyCheckLimit;
     }
 
     public int getChecksUsed() {
@@ -23,18 +30,18 @@ public class CheckingAccount extends Account {
 
     // Constructor
 
-    public CheckingAccount(float balance, int number, String owner, int monthlyCheckLimit, int checksUsed) {
+    public CheckingAccount(double balance, int number, String owner, int limit, int used) {
         super(balance, number, owner);
-        this.monthlyCheckLimit = monthlyCheckLimit;
-        this.checksUsed = checksUsed;
+        monthlyCheckLimit = limit;
+        checksUsed = used;
     }
 
     // Overriden methods
-    
+
     @Override
-    public void deposit(float amount) {
+    public void deposit(double amount) {
         if (checksUsed == monthlyCheckLimit) {
-            System.err.println("Maximum number of checks (%d) for account %d reached".formatted(monthlyCheckLimit, getNumber()));
+            System.err.println(ERROR);
             return;
         }
         setBalance(getBalance() + amount);
@@ -42,12 +49,22 @@ public class CheckingAccount extends Account {
     }
 
     @Override
-    public void withdraw(float amount) {
+    public void withdraw(double amount) {
         if (checksUsed == monthlyCheckLimit) {
-            System.err.println("Maximum number of checks (%d) for account %d reached".formatted(monthlyCheckLimit, getNumber()));
+            System.err.println(ERROR);
             return;
         }
         setBalance(getBalance() - amount);
         checksUsed++;
+    }
+
+    public void close() {
+        super.close();
+        checksUsed = 0;
+        monthlyCheckLimit = 0;
+    }
+
+    public String toString() {
+        return "Type: checking " + super.toString() + " Max: " + monthlyCheckLimit + " Used: " + checksUsed;
     }
 }
