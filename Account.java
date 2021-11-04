@@ -1,3 +1,9 @@
+/**
+ * Assignment 2
+ * 
+ * @author Charlie Lin
+ * @since 11/3/2021
+ */
 public abstract class Account {
     private float balance;
     private int number;
@@ -34,7 +40,10 @@ public abstract class Account {
     }
 
     public abstract void deposit(float amount);
+
     public abstract void withdraw(float amount);
+
+    // Transfers do not use a check (in case of checking accounts), so this kludge is needed.
     public void transfer(Account a, float amount) {
         withdraw(amount);
         a.deposit(amount);

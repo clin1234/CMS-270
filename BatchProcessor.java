@@ -6,6 +6,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+/**
+ * Assignment 2
+ * @author Charlie Lin
+ * @since 11/3/2021
+ */
+
 public class BatchProcessor {
     static ArrayList<Account> accounts;
 
@@ -20,19 +26,26 @@ public class BatchProcessor {
     }
 
     public static void parseAccountsFile() throws IOException {
-        final var tmp = Files.readAllLines(Paths.get("accounts.txt"));
-        accounts = new ArrayList<Account>(tmp.size());
-        String[] strs;
-        for (final var s : tmp) {
-            strs = s.split(" ");
-            final var name = strs[2] + ' ' + strs[3];
-            final float balance = Float.parseFloat(strs[4]);
-            final int id = Integer.parseInt(strs[0]);
+        final var lines = Files.readAllLines(Paths.get("accounts.txt"));
+        accounts = new ArrayList<>(lines.size());
+        String[] fields;
+        for (final var line : lines) {
+            fields = line.split(" ");
+            final var name = fields[2] + ' ' + fields[3];
+            final float balance = Float.parseFloat(fields[4]);
+            final int id = Integer.parseInt(fields[0]);
+            final String type = fields[1];
+            /* A switch expression, indicated by the arrow after each case label, yields a returnable value
+            corresponding to the label, and there's no fall-through. In this case, this simplifies
+            adding an instance of a subclass of Account to the ArrayList.*/
             accounts.add(
-                switch (strs[1]) {
-                    case "C" -> new CheckingAccount(balance, id, name, Integer.parseInt(strs[6]), Integer.parseInt(strs[5]));
+                switch (type) {
+                    /* Fifth and sixth fields correspond to the number of checks used,
+                    and the maxmimum number of checks allowed. */
+                    case "C" -> new CheckingAccount(balance, id, name, Integer.parseInt(fields[6]), Integer.parseInt(fields[5]));
                     case "S" -> new SavingsAccount(balance, id, name);
-                    default -> throw new IllegalArgumentException("Unexpected value: " + strs[1]);
+                    // Unlikely, but helpful in case of bad input
+                    default -> throw new IllegalArgumentException("Unexpected value: " + fields[1]);
                 }
             );
         }
@@ -41,27 +54,30 @@ public class BatchProcessor {
     public static void parseBatches() throws IOException {
         final var lines = Files.readAllLines(Paths.get("batch.txt"));
         for (final var line : lines) {
-            final var strs = line.split(" ");
-            final int id = Integer.parseInt(strs[1]);
+            final var fields = line.split(" ");
+            final int id = Integer.parseInt(fields[1]);
+            // One-liner to find an Account object corresponding to the Account number
             final var tmp = accounts.parallelStream().filter(a -> a.getNumber() == id).findAny();
-            switch (strs[0]) {
+            /* The tmp.ifPresentOrElse method ensures that in case no account has the id,
+            the program errors out before executing any type of transaction. */
+            switch (fields[0]) {
                 case "W": {
-                    final String name = strs[3] + " " + strs[4];
-                    final float amt = Float.parseFloat(strs[2]);
+                    final String name = fields[3] + " " + fields[4];
+                    final float amt = Float.parseFloat(fields[2]);
                     tmp.ifPresentOrElse(val -> {
                         val = processWithdrawal(val, amt, name);
                     }, () -> System.out.println("Account " + id + " not found."));
                 }
                     break;
                 case "D": {
-                    final float amt = Float.parseFloat(strs[2]);
+                    final float amt = Float.parseFloat(fields[2]);
                     tmp.ifPresentOrElse(val -> {
                         val = processDeposit(val, amt);
                     }, () -> System.out.println("Account " + id + " not found."));
                 }
                     break;
                 case "C": {
-                    final String name = strs[2] + " " + strs[3];
+                    final String name = fields[2] + " " + fields[3];
                     tmp.ifPresentOrElse(val -> {
                         val = processClose(val, name);
                     }, () -> System.out.println("Account " + id + " not found."));
@@ -69,12 +85,13 @@ public class BatchProcessor {
                     break;
 
                 case "T": {
-                    final String name = strs[4] + " " + strs[5];
-                    final float amt = Float.parseFloat(strs[3]);
-                    final int destId = Integer.parseInt(strs[2]);
-                    var p = accounts.stream().filter(a -> a.getNumber() == destId).findAny();
-                    if (p.isPresent() && tmp.isPresent()) {
-                        processTransfer(tmp.get(), p.get(), amt, name);
+                    final String name = fields[4] + " " + fields[5];
+                    final float amt = Float.parseFloat(fields[3]);
+                    final int destId = Integer.parseInt(fields[2]);
+                    // One-liner to find an Account object corresponding to the destination account number
+                    var destAcct = accounts.stream().filter(a -> a.getNumber() == destId).findAny();
+                    if (destAcct.isPresent() && tmp.isPresent()) {
+                        processTransfer(tmp.get(), destAcct.get(), amt, name);
                     }
                 }
                     break;
@@ -83,9 +100,13 @@ public class BatchProcessor {
     }
 
     public static void writeAccounts() throws FileNotFoundException {
+        /* Pass in a FileOutStream object in PrintWriter's constructor, because 
+        FileOutputStream's constructor has a boolean parameter that either appends writes to a file (true),
+        or overwrites it (false) */
         try (final var write = new PrintWriter(new FileOutputStream("accounts.txt", false))) {
             for (final var a : accounts) {
                 final char type = a instanceof CheckingAccount ? 'C' : 'S';
+                // Appending to a StringBuilder instead of a String is less costly resource-wise
                 var b = new StringBuilder("%d %c %s %.2f".formatted(a.getNumber(), type, a.getOwner(), a.getBalance()));
                 if (a instanceof CheckingAccount c)
                     b.append(" %d %d".formatted(c.getChecksUsed(), c.getMonthlyCheckLimit()));
