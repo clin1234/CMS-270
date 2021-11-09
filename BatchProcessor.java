@@ -113,7 +113,7 @@ public class BatchProcessor {
 
     public static Account processDeposit(Account a, double Amt) {
         a.deposit(Amt);
-        System.out.println(a.toString());
+        // System.out.println(a.toString());
         return a;
     }
 
@@ -122,7 +122,7 @@ public class BatchProcessor {
             System.err.println(owner + " cannot withdraw %.2f from Account %d".formatted(Amt, a.getNumber()));
         else
             a.withdraw(Amt);
-        System.out.println(a.toString());
+        // System.out.println(a.toString());
         return a;
     }
 
@@ -131,7 +131,7 @@ public class BatchProcessor {
             System.err.println(owner + " cannot transfer from Account %d".formatted(a.getNumber()));
         }
         a.transfer(b, Amt);
-        System.out.println(a.toString());
+        // System.out.println(a.toString());
     }
 
     public static Account processClose(Account a, String owner) {
@@ -140,7 +140,7 @@ public class BatchProcessor {
             return a;
         } else {
             a.close();
-            System.out.println(a.toString());
+            // System.out.println(a.toString());
             var b = accounts.remove(accounts.indexOf(a));
             assert !accounts.contains(b);
             return b;
