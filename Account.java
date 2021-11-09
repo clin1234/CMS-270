@@ -44,9 +44,10 @@ public abstract class Account {
     public abstract void withdraw(double amount);
 
     public void transfer(Account a, double amount) {
+        // Lowering balance in a transfer obeys the same rules as withdrawls, hence the call to withdraw()
         withdraw(amount);
-        if (a instanceof CheckingAccount ca)
-            ca.setBalance(ca.getBalance() + amount);
+        // Transfering to a recipient checking account does not incur a check.
+        a.setBalance(a.getBalance() + amount);
     }
 
     public void close() {
