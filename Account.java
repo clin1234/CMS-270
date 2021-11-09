@@ -9,11 +9,15 @@ public abstract class Account {
 	private int number;
 	private String owner;
 
+	// Constructor
+
 	public Account(double balance, int number, String owner) {
 		this.balance = balance;
 		this.number = number;
 		this.owner = owner;
 	}
+
+	// Getters and setters
 
 	public double getBalance() {
 		return balance;
@@ -39,6 +43,8 @@ public abstract class Account {
 		this.number = number;
 	}
 
+	// Transaction methods
+
 	public abstract void deposit(double amount);
 
 	public abstract void withdraw(double amount);
@@ -52,14 +58,17 @@ public abstract class Account {
 	}
 
 	public void close() {
-		if (balance > 0) {
+		if (balance >= 0) {
 			owner = null;
 			number = 0;
 			balance = 0;
-		}
+		} else
+			System.err.println(owner + String.format(" cannot close Account %d", getNumber()));
 	}
 
+	// Auxiliary methods
+
 	public String toString() {
-		return "Owner: %s ID: %d Balance: %.2f".formatted(owner, number, balance);
+		return String.format("Owner: %s ID: %d Balance: %.2f", owner, number, balance);
 	}
 }

@@ -7,15 +7,24 @@
 public class SavingsAccount extends Account {
 	private boolean feeCharged = false;
 
+    // Constructor
+
 	public SavingsAccount(double balance, int number, String owner) {
 		super(balance, number, owner);
 	}
 
+    // Overriden transactional methods
+
 	public void withdraw(double amount) {
+        if (amount > getBalance()) {
+            System.err.println(String.format("Withdrawing %.2f exceeds current savings balance of %.2f. Stop.",
+                amount, getBalance()));
+            return;
+        }
 		if (getBalance() - amount < 150)
 			/*
 			 * Maintainance fee is only charged once per month, and since the batch file
-			 * contains transactions for one month, check if the fees has been charged
+			 * contains transactions for one month, check if the fee has been charged
 			 * already.
 			 */
 			if (!feeCharged) {
@@ -29,10 +38,13 @@ public class SavingsAccount extends Account {
 		setBalance(getBalance() + amount);
 	}
 
+    @Override
 	public void close() {
 		super.close();
 		feeCharged = false;
 	}
+
+    // Auxiliary methods
 
 	public String toString() {
 		return "Type: savings " + super.toString() + " Fee charged? " + feeCharged;

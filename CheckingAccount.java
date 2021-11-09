@@ -7,8 +7,16 @@
 public class CheckingAccount extends Account {
 	private int monthlyCheckLimit;
 	private int checksUsed;
-	private String ERROR = "Maximum number of checks (%d) for account %d reached".formatted(monthlyCheckLimit,
-			getNumber());
+	private String ERROR;
+
+	// Constructor
+
+	public CheckingAccount(double balance, int number, String owner, int limit, int used) {
+		super(balance, number, owner);
+		monthlyCheckLimit = limit;
+		checksUsed = used;
+		ERROR = String.format("Maximum number of checks (%d) for account %d reached", monthlyCheckLimit, getNumber());
+	}
 
 	// Getters and setters
 
@@ -26,14 +34,6 @@ public class CheckingAccount extends Account {
 
 	public void setChecksUsed(int checksUsed) {
 		this.checksUsed = checksUsed;
-	}
-
-	// Constructor
-
-	public CheckingAccount(double balance, int number, String owner, int limit, int used) {
-		super(balance, number, owner);
-		monthlyCheckLimit = limit;
-		checksUsed = used;
 	}
 
 	// Overridden methods
@@ -58,11 +58,14 @@ public class CheckingAccount extends Account {
 		checksUsed++;
 	}
 
+	@Override
 	public void close() {
 		super.close();
 		checksUsed = 0;
 		monthlyCheckLimit = 0;
 	}
+
+	// Auxiliary methods
 
 	public String toString() {
 		return "Type: checking " + super.toString() + " Max: " + monthlyCheckLimit + " Used: " + checksUsed;
