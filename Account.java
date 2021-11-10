@@ -53,8 +53,13 @@ public abstract class Account {
 		// Lowering balance in a transfer obeys the same rules as withdrawals, hence the
 		// call to withdraw()
 		withdraw(amount);
-		// Transferring to a recipient checking account does not incur a check.
+		// Recipient checking account does not incur a check when receiving transfer.
+		// This works for any type of recipient account.
 		a.setBalance(a.getBalance() + amount);
+	}
+
+	public boolean isClosable() {
+		return balance >= 0;
 	}
 
 	public void close() {

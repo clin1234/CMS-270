@@ -5,12 +5,13 @@
  * @since 11/3/2021
  */
 public class SavingsAccount extends Account {
-	private boolean feeCharged = false;
+	private boolean feeCharged;
 
     // Constructor
 
 	public SavingsAccount(double balance, int number, String owner) {
 		super(balance, number, owner);
+		feeCharged = false;
 	}
 
     // Overriden transactional methods

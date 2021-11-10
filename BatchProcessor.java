@@ -1,10 +1,6 @@
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
 /**
  * Assignment 2
@@ -32,46 +28,61 @@ public class BatchProcessor {
 	/* Files.readAllLines() could throw a checked exception. To handle this,
 	annotate the method in its signature, in order to handle it in main().*/
 	public static void parseAccounts() throws IOException {
-		final var lines = Files.readAllLines(Paths.get("accounts.txt"));
+		final List<String> lines = Files.readAllLines(Paths.get("accounts.txt"));
 		// Reserve capacity of ArrayList equal to the number of lines in accounts.txt
 		accounts = new ArrayList<>(lines.size());
 		String[] fields;
-		for (final var line : lines) {
+		for (final String line : lines) {
 			fields = line.split(" ");
 			// Owner
-			final var name = fields[2] + ' ' + fields[3];
+			final String name = fields[2] + ' ' + fields[3];
 			// Account balance
 			final float balance = Float.parseFloat(fields[4]);
 			// Account number
 			final int id = Integer.parseInt(fields[0]);
 			// Account type
 			final String type = fields[1];
+
+			switch (type) {
+				case "C":
+					/* Fifth and sixth fields correspond to the number of checks used, and the
+					maximum number of checks allowed. */
+					accounts.add(new CheckingAccount(balance, id, name, Integer.parseInt(fields[6]),
+						Integer.parseInt(fields[5])));
+					break;
+				case "S":
+					accounts.add(new SavingsAccount(balance, id, name));
+					break;
+			}
+
 			/*
 			 * A switch expression, indicated by the arrow after each case label, yields a
 			 * returnable value corresponding to the label, and no fall-through occurs. In
 			 * this case, this simplifies adding an instance of a subclass of Account to the
 			 * ArrayList.
 			 */
-			accounts.add(switch (type) {
+			// accounts.add(switch (type) {
 			/*
 			 * Fifth and sixth fields correspond to the number of checks used, and the
 			 * maximum number of checks allowed.
 			 */
+			/*
 			case "C" -> new CheckingAccount(balance, id, name, Integer.parseInt(fields[6]),
 					Integer.parseInt(fields[5]));
 			case "S" -> new SavingsAccount(balance, id, name);
 			// Required in a switch expression. Throw an exception just in case.
 			default -> throw new IllegalArgumentException("Unexpected value: " + fields[1]);
 			});
+			*/
 		}
 	}
 
 	/* Files.readAllLines() could throw a checked exception. To handle this,
 	annotate the method in its signature, in order to handle it in main().*/
 	public static void parseBatches() throws IOException {
-		final var lines = Files.readAllLines(Paths.get("batch.txt"));
-		for (final var line : lines) {
-			final var fields = line.split(" ");
+		final List<String> lines = Files.readAllLines(Paths.get("batch.txt"));
+		for (final String line : lines) {
+			final String[] fields = line.split(" ");
 			// Account number
 			final int id = Integer.parseInt(fields[1]);
 			/*
@@ -81,7 +92,7 @@ public class BatchProcessor {
 			 * 2. Search an account matching the account number (first field) on the stream
 			 * 3. Gets the Account object that satisfies step 2.
 			 */
-			var sourceAct = accounts.parallelStream().filter(a -> a.getNumber() == id).findFirst().get();
+			Account sourceAct = accounts.parallelStream().filter(a -> a.getNumber() == id).findFirst().get();
 			// First field is type of transaction
 			switch (fields[0]) {
 				case "W": {
@@ -108,10 +119,8 @@ public class BatchProcessor {
 					final int destId = Integer.parseInt(fields[2]);
 					// One-liner to find an Account object corresponding to the destination account
 					// number
-					var destAcct = accounts.stream().filter(a -> a.getNumber() == destId).findAny();
-					if (destAcct.isPresent()) {
-						processTransfer(sourceAct, destAcct.get(), amount, name);
-					}
+					Account destAcct = accounts.stream().filter(a -> a.getNumber() == destId).findAny().get();
+					processTransfer(sourceAct, destAcct, amount, name);
 				}
 					break;
 			}
@@ -126,12 +135,12 @@ public class BatchProcessor {
 		 * FileOutputStream's constructor has a boolean parameter that either appends
 		 * writes to a file (true), or overwrites it (false)
 		 */
-		try (final var write = new PrintWriter(new FileOutputStream("accounts.txt", false))) {
-			for (final var a : accounts) {
+		try (final PrintWriter write = new PrintWriter(new FileOutputStream("accounts.txt", false))) {
+			for (final Account a : accounts) {
 				// Assign to the character 'C' if the account is a checking one, 'S' otherwise
 				final char type = a instanceof CheckingAccount ? 'C' : 'S';
 				// Appending to a StringBuilder instead of a String is less costly resource-wise
-				final var tmpBuilder = new StringBuilder(
+				final StringBuilder tmpBuilder = new StringBuilder(
 						String.format("%d %c %s %.2f", a.getNumber(), type, a.getOwner(), a.getBalance()));
 				if (a instanceof CheckingAccount c)
 					tmpBuilder.append(String.format(" %d %d", c.getChecksUsed(), c.getMonthlyCheckLimit()));
@@ -165,17 +174,17 @@ public class BatchProcessor {
 	}
 
 	public static Account processClose(Account a, String owner) {
-		if (!a.getOwner().equals(owner)) {
+		if (!a.getOwner().equals(owner) || !a.isClosable()) {
 			System.err.println(owner + String.format(" cannot close Account %d", a.getNumber()));
 			return a;
 		} else {
 			a.close();
 			// System.out.println(a.toString());
-			// Removes account from ArrayList, then store removed account
-			var b = accounts.remove(accounts.indexOf(a));
+			// Removes account from ArrayList, then store removed account in a variable
+			Account closedAcct = accounts.remove(accounts.indexOf(a));
 			// Sanity check
-			assert !accounts.contains(b);
-			return b;
+			assert !accounts.contains(closedAcct);
+			return closedAcct;
 		}
 	}
 }

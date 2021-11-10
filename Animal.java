@@ -4,24 +4,20 @@
  * Lab 6
  */
 
-public abstract class Animal {
-    private String name, color;
+public abstract class Animal implements Alive{
+    private String name;
     private int age;
 
+    public Animal(String name, int a) {
+        this.name = name;
+        age = a;
+    }
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
     }
 
     public int getAge() {
@@ -32,13 +28,8 @@ public abstract class Animal {
         this.age = age;
     }
 
-    public Animal(String name) {
-        this.name = name;
+    public int move(String s) {
+        System.out.println("Moving to " + s + " takes " + s.length() + " moves.");
+        return s.length();
     }
-
-    public void walk() {
-        System.out.println("I %s am walking".formatted(name));
-    }
-
-    public abstract void makeSound();
 }

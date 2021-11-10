@@ -9,3 +9,5 @@ in playlist randomly. (lab 3)
 * *Account.java (lab 4)
 * Animal.java, AnimalFarm.java, Cow.java, Duck.java (hang out lab)
 * CheckingAccount.java, SavingsAccount.java, BatchProcessor.java (assignment 1)
+* CommonBehavior.java, ColorChanging.java, Alive.java, Avatar.java, 
+Horse.java, InterfaceDriver.java, Salamander.java, TrafficLight.java, Train.java (lab 7)

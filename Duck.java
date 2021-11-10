@@ -3,9 +3,8 @@
  * @since 10/20/2021
  * Hang Out Lab
  */
-public class Duck extends Animal {
+public class Duck extends Animal implements CommonBehavior{
     private int wingSpan;
-    private String billColor;
 
     public int getWingSpan() {
         return wingSpan;
@@ -15,33 +14,30 @@ public class Duck extends Animal {
         this.wingSpan = wingSpan;
     }
 
-    public String getBillColor() {
-        return billColor;
-    }
 
-    public void setBillColor(String billColor) {
-        this.billColor = billColor;
-    }
-
-    public Duck(int wingSpan, String name, String billColor) {
-        super(name);
+    public Duck(int wingSpan, int age, String name, String billColor) {
+        super(name, age);
         this.wingSpan = wingSpan;
-        this.billColor = billColor;
     }
-
-    @Override
-    public void walk() {
-        System.out.println("I am %s, I am waddling!".formatted(getName()));
-    }
-
-    @Override
     public void makeSound() {
         System.out.println("Quack");
 
     }
 
-    public void swim() {
-        System.out.println("I'm swimming.");
+    public void fly() {
+        System.out.println("Flying is fun! Wheee");
     }
 
+    @Override
+    public void touch(String t) {
+       System.out.println("Apparently this duck is fond of touching "+t); 
+    }
+
+    @Override
+    public void help() {
+        System.out.println("A small duck has arrived! What help do you need?");
+    }
+    public void summon(int c) {
+        System.out.println("A horde of "+c*2+" ducks arrived from a different dimension.");
+    }
 }
