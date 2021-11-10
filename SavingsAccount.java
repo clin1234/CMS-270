@@ -41,7 +41,6 @@ public class SavingsAccount extends Account {
 
     @Override
 	public void close() {
-		super.close();
 		feeCharged = false;
 	}
 

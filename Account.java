@@ -46,8 +46,8 @@ public abstract class Account {
 	// Transaction methods
 
 	public abstract void deposit(double amount);
-
 	public abstract void withdraw(double amount);
+	public abstract void close();
 
 	public void transfer(Account a, double amount) {
 		// Lowering balance in a transfer obeys the same rules as withdrawals, hence the
@@ -60,15 +60,6 @@ public abstract class Account {
 
 	public boolean isClosable() {
 		return balance >= 0;
-	}
-
-	public void close() {
-		if (balance >= 0) {
-			owner = null;
-			number = 0;
-			balance = 0;
-		} else
-			System.err.println(owner + String.format(" cannot close Account %d", getNumber()));
 	}
 
 	// Auxiliary methods

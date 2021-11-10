@@ -59,11 +59,7 @@ public class CheckingAccount extends Account {
 	}
 
 	@Override
-	public void close() {
-		super.close();
-		checksUsed = 0;
-		monthlyCheckLimit = 0;
-	}
+	public void close() {}
 
 	// Auxiliary methods
 

@@ -19,7 +19,7 @@ public class BatchProcessor {
 			writeAccounts();
 			// Handle exceptions in main() to simplify code flow.
 			// Also, FileNotFoundException is a subclass of IOException,
-			// so this works
+			// so this works by parametric polymorphism
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
