@@ -24,7 +24,7 @@ public class Cow extends Animal {
     }
 
     public Cow(int numSpots, String name, String breed) {
-        super(name);
+        super(name,0);
         this.numSpots = numSpots;
         this.breed = breed;
     }
