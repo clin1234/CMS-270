@@ -11,3 +11,4 @@ in playlist randomly. (lab 3)
 * CheckingAccount.java, SavingsAccount.java, BatchProcessor.java (assignment 1)
 * CommonBehavior.java, ColorChanging.java, Alive.java, Avatar.java, 
 Horse.java, InterfaceDriver.java, Salamander.java, TrafficLight.java, Train.java (lab 7)
+* Equation.java, EquationTest.java (assignment 4)
